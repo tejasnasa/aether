@@ -1,19 +1,20 @@
 import app from "./app";
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { PrismaClient } from "@prisma/client";
+export const prisma = new PrismaClient();
 
-const connectionString = process.env.DATABASE_URL;
 const port = process.env.PORT;
 
-try {
-  const client = postgres(connectionString, { prepare: false });
-  const db = drizzle(client);
-  console.log("Connected to database");
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+prisma
+  .$connect()
+  .then(() => {
+    console.log("Connected to the database.");
+
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  })
+  .catch((err: Error) => {
+    console.log("Failed to connect to the database:", err);
   });
-} catch (error) {
-  console.log("Failed to connect to the database: ", error);
-}
 
 export default app;
